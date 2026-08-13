@@ -27,7 +27,8 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ currentCategory }) => {
         setError(null);
         try {
             // Fetch from backend server
-            const response = await fetch(`http://localhost:5001/api/news?category=${currentCategory}`);
+            const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+            const response = await fetch(`${apiBaseUrl}/api/news?category=${currentCategory}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch news from server.');
             }
