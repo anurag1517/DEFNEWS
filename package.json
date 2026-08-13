@@ -2,8 +2,8 @@
   "name": "news-intelligence-platform-root",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix frontend/frontend-news",
-    "dev": "npm run dev --prefix frontend/frontend-news",
-    "start": "npm run dev --prefix frontend/frontend-news"
+    "postinstall": "npm install --prefix backend && npm install --prefix frontend/frontend-news",
+    "dev": "npx -y concurrently \"npm start --prefix backend\" \"npm run dev --prefix frontend/frontend-news\"",
+    "start": "npx -y concurrently \"npm start --prefix backend\" \"npm run dev --prefix frontend/frontend-news\""
   }
 }

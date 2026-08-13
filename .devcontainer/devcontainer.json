@@ -1,13 +1,17 @@
 {
   "name": "News Intelligence Platform",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
-  "postCreateCommand": "npm install",
-  "postStartCommand": "npm run dev",
+  "postCreateCommand": "npm install --prefix backend && npm install --prefix frontend/frontend-news",
+  "postStartCommand": "npx -y concurrently \"npm start --prefix backend\" \"npm run dev --prefix frontend/frontend-news\"",
   "portsAttributes": {
     "5173": {
       "label": "Frontend Dev Server",
       "onAutoForward": "openBrowser"
+    },
+    "5001": {
+      "label": "Backend Dev Server",
+      "onAutoForward": "ignore"
     }
   },
-  "forwardPorts": [5173]
+  "forwardPorts": [5173, 5001]
 }

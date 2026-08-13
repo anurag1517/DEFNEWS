@@ -1,7 +1,12 @@
 tasks:
+  - name: Run Backend
+    init: npm install --prefix backend
+    command: npm start --prefix backend
   - name: Run Frontend
-    init: npm install
-    command: npm run dev
+    init: npm install --prefix frontend/frontend-news
+    command: npm run dev --prefix frontend/frontend-news
 ports:
   - port: 5173
     onOpen: open-preview
+  - port: 5001
+    onOpen: ignore
