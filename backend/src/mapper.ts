@@ -1,5 +1,4 @@
-import { NewsItem } from './index';
-
+import { NewsItem } from './types';
 
 export interface RawNewsApiArticle {
     uri: string;
@@ -34,10 +33,8 @@ export function mapNewsApiArticleToNewsItem(raw: RawNewsApiArticle): NewsItem {
     return {
         id: raw.uri || crypto.randomUUID(),
         title: raw.title || 'Untitled Article',
-        // Truncate body or description safely if it's too long
         description: raw.body ? `${raw.body.substring(0, 160)}...` : 'No description available.',
         source: raw.source?.title || 'Unknown Source',
-        // Example logic for trust status (e.g., verified or well-known database source)
         isTrusted: Boolean(raw.source?.title),
         category: resolveCategory(raw.categories),
         publishedAt: raw.dateTime || new Date().toISOString(),

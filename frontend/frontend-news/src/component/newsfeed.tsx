@@ -116,9 +116,9 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ currentCategory }) => {
             {articles.map((article) => (
                 <article key={article.id} className="news-card">
                     <div className="news-card-image-wrapper">
-                        <img 
-                            src={article.imageUrl} 
-                            alt={article.title} 
+                        <img
+                            src={article.imageUrl}
+                            alt={article.title}
                             className="news-card-image"
                             onError={(e) => {
                                 // Fallback image if unsplash fails or goes offline
@@ -156,12 +156,12 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ currentCategory }) => {
 
                         <h2 className="news-card-title">{article.title}</h2>
                         <p className="news-card-description">{article.description}</p>
-                        
+
                         <div className="news-card-footer">
-                            <a 
-                                href={article.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
+                            <a
+                                href={article.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="news-card-link"
                             >
                                 Read Full Story
