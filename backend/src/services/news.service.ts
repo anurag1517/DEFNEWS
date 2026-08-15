@@ -4,7 +4,17 @@ import { NewsItem } from '../types';
 import { env } from '../config/env';
 import { CATEGORY_KEYWORDS } from '../config/mapperRules';
 
-const parser = new Parser();
+const parser = new Parser({
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    },
+    customFields: {
+        item: [
+            ['media:content', 'mediaContent'],
+            ['media:thumbnail', 'mediaThumbnail']
+        ]
+    }
+});
 const REDIS_KEY = 'defnews:articles';
 
 // Redis Client with fallback
@@ -48,6 +58,46 @@ function determineCategory(title: string, snippet: string): NewsItem['category']
     return bestCategory;
 }
 
+function extractImage(item: any): string {
+    // 1. Check enclosure tag
+    if (item.enclosure?.url) {
+        return item.enclosure.url;
+    }
+
+    // 2. Check regex parsed mediaUrl
+    if (item.mediaUrl) {
+        return item.mediaUrl;
+    }
+
+    // 3. Check custom mapped fields
+    if (item.mediaContent?.$?.url) {
+        return item.mediaContent.$.url;
+    }
+    if (item.mediaThumbnail?.$?.url) {
+        return item.mediaThumbnail.$.url;
+    }
+
+    // 4. Check raw namespaced properties
+    const rawMedia = item['media:content'] || item['media:thumbnail'];
+    if (rawMedia?.$?.url) {
+        return rawMedia.$.url;
+    }
+    if (rawMedia?.url) {
+        return rawMedia.url;
+    }
+
+    // 5. Scan HTML description/content for <img> tags
+    const html = `${item.content || ''} ${item.description || ''} ${item.contentSnippet || ''}`;
+    const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
+    const match = html.match(imgRegex);
+    if (match && match[1]) {
+        return match[1];
+    }
+
+    // 6. Default fallback
+    return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800';
+}
+
 function parseMalformedRSS(xml: string): any[] {
     const items: any[] = [];
     const itemMatches = xml.match(/<item>([\s\S]*?)<\/item>/g);
@@ -58,6 +108,9 @@ function parseMalformedRSS(xml: string): any[] {
         const description = itemXml.match(/<description>([\s\S]*?)<\/description>/)?.[1] || '';
         const link = itemXml.match(/<link>([\s\S]*?)<\/link>/)?.[1] || '';
         const pubDate = itemXml.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] || '';
+
+        // Extract media url attribute using regex
+        const mediaUrl = itemXml.match(/<(enclosure|media:content|media:thumbnail)[^>]+url=["']([^"']+)["']/i)?.[2] || '';
 
         const cleanText = (str: string) => {
             return str
@@ -74,7 +127,8 @@ function parseMalformedRSS(xml: string): any[] {
             title: cleanText(title),
             contentSnippet: cleanText(description),
             link: cleanText(link),
-            pubDate: cleanText(pubDate)
+            pubDate: cleanText(pubDate),
+            mediaUrl: cleanText(mediaUrl)
         });
     }
     return items;
@@ -103,7 +157,8 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
 
         return items.map((item, index) => {
             const snippet = item.contentSnippet || item.content || '';
-            const category = determineCategory(item.title || '', snippet);
+            const category = determineCategory(item.title || 'trending', snippet);
+            const imageUrl = extractImage(item);
 
             return {
                 id: item.guid || item.link || `${sourceName}-${index}-${Date.now()}`,
@@ -114,7 +169,7 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
                 category: category === 'trending' ? defaultCategory : category,
                 publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
                 url: item.link || '#',
-                imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800'
+                imageUrl: imageUrl
             };
         });
     } catch (err) {

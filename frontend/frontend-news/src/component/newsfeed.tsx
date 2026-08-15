@@ -1,23 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './newsfeed.css';
+import type { NewsArticle, NewsFeedProps } from '../types/newsCard';
 
-export interface NewsArticle {
-    id: string;
-    title: string;
-    description: string;
-    source: string;
-    isTrusted: boolean;
-    category: string;
-    publishedAt: string;
-    url: string;
-    imageUrl: string;
-}
-
-interface NewsFeedProps {
-    currentCategory: string;
-}
-
-export const NewsFeed: React.FC<NewsFeedProps> = ({ currentCategory }) => {
+export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
     const [articles, setArticles] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,7 +11,6 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ currentCategory }) => {
         setLoading(true);
         setError(null);
         try {
-            // Fetch from backend server
             const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             const response = await fetch(`${apiBaseUrl}/api/news?category=${currentCategory}`);
             if (!response.ok) {
