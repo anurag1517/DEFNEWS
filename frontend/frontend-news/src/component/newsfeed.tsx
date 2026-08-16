@@ -17,7 +17,13 @@ export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
                 throw new Error('Failed to fetch news from server.');
             }
             const data = await response.json();
-            setArticles(data);
+            const sortedData = (data as NewsArticle[]).sort((a, b) => {
+                if (a.isTrusted !== b.isTrusted) {
+                    return a.isTrusted ? -1 : 1;
+                }
+                return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+            });
+            setArticles(sortedData);
         } catch (err: any) {
             setError(err.message || 'An error occurred while fetching news.');
         } finally {

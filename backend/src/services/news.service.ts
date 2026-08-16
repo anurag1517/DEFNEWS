@@ -35,6 +35,10 @@ export async function initRedis() {
     }
 }
 
+function escapeRegExp(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function determineCategory(title: string, snippet: string): NewsItem['category'] {
     const text = `${title} ${snippet}`.toLowerCase();
 
@@ -46,7 +50,8 @@ function determineCategory(title: string, snippet: string): NewsItem['category']
 
         let matches = 0;
         for (const kw of keywords) {
-            if (text.includes(kw)) {
+            const regex = new RegExp(`\\b${escapeRegExp(kw)}\\b`, 'i');
+            if (regex.test(text)) {
                 matches++;
             }
         }
@@ -269,6 +274,14 @@ export async function scrapeAndCacheNews(): Promise<NewsItem[]> {
     const uniqueMap = new Map<string, NewsItem>();
     combined.forEach(item => uniqueMap.set(item.url, item));
     const uniqueArticles = Array.from(uniqueMap.values());
+
+    // Sort: Verified sources (isTrusted = true) first, then by date descending
+    uniqueArticles.sort((a, b) => {
+        if (a.isTrusted !== b.isTrusted) {
+            return a.isTrusted ? -1 : 1;
+        }
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    });
 
     // Cache results
     memoryCache = uniqueArticles;

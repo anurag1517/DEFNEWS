@@ -21,9 +21,9 @@ export const CATEGORY_KEYWORDS: Record<NewsItem['category'], string[]> = {
         'election', 'court', 'ministry', 'pib', 'state', 'bjp', 'congress', 'constitution'
     ],
     international: [
-        'international', 'global', 'united nations', 'un', 'treaty', 'bilateral', 'geopolitics',
-        'foreign policy', 'embassy', 'diplomacy', 'diplomatic', 'summit', 'g20', 'china', 'us',
-        'middle east', 'conflict'
+        'international', 'global', 'united nations', 'treaty', 'bilateral', 'geopolitics',
+        'foreign policy', 'embassy', 'diplomacy', 'diplomatic', 'summit', 'g20', 'china', 'usa',
+        'united states', 'middle east', 'conflict'
     ],
     trending: []
 };
