@@ -60,31 +60,52 @@ function determineCategory(title: string, snippet: string): NewsItem['category']
     return bestCategory;
 }
 
-function extractImage(item: any): string {
+const CATEGORY_FALLBACK_IMAGES: Record<NewsItem['category'], string> = {
+    Defence: 'https://images.unsplash.com/photo-1579912437766-7892db633c3f?auto=format&fit=crop&q=80&w=800',
+    technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800',
+    business: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=800',
+    national: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&q=80&w=800',
+    international: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=800',
+    trending: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800'
+};
+
+function isGenericGoogleImage(imgUrl: string): boolean {
+    if (!imgUrl) return true;
+    const lower = imgUrl.toLowerCase();
+    return (
+        lower.includes('googleusercontent.com') ||
+        lower.includes('news.google.com') ||
+        lower.includes('gstatic.com') ||
+        lower.includes('google.com') ||
+        lower.includes('google_news')
+    );
+}
+
+function extractImage(item: any, category: NewsItem['category'] = 'trending'): string {
     // 1. Check enclosure tag
-    if (item.enclosure?.url) {
+    if (item.enclosure?.url && !isGenericGoogleImage(item.enclosure.url)) {
         return item.enclosure.url;
     }
 
     // 2. Check regex parsed mediaUrl
-    if (item.mediaUrl) {
+    if (item.mediaUrl && !isGenericGoogleImage(item.mediaUrl)) {
         return item.mediaUrl;
     }
 
     // 3. Check custom mapped fields
-    if (item.mediaContent?.$?.url) {
+    if (item.mediaContent?.$?.url && !isGenericGoogleImage(item.mediaContent.$.url)) {
         return item.mediaContent.$.url;
     }
-    if (item.mediaThumbnail?.$?.url) {
+    if (item.mediaThumbnail?.$?.url && !isGenericGoogleImage(item.mediaThumbnail.$.url)) {
         return item.mediaThumbnail.$.url;
     }
 
     // 4. Check raw namespaced properties
     const rawMedia = item['media:content'] || item['media:thumbnail'];
-    if (rawMedia?.$?.url) {
+    if (rawMedia?.$?.url && !isGenericGoogleImage(rawMedia.$.url)) {
         return rawMedia.$.url;
     }
-    if (rawMedia?.url) {
+    if (rawMedia?.url && !isGenericGoogleImage(rawMedia.url)) {
         return rawMedia.url;
     }
 
@@ -92,12 +113,12 @@ function extractImage(item: any): string {
     const html = `${item.content || ''} ${item.description || ''} ${item.contentSnippet || ''} ${item.contentEncoded || ''}`;
     const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
     const match = html.match(imgRegex);
-    if (match && match[1]) {
+    if (match && match[1] && !isGenericGoogleImage(match[1])) {
         return match[1];
     }
 
-    // 6. Default fallback
-    return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800';
+    // 6. Category specific fallback
+    return CATEGORY_FALLBACK_IMAGES[category] || CATEGORY_FALLBACK_IMAGES.trending;
 }
 
 function parseMalformedRSS(xml: string): any[] {
@@ -136,18 +157,48 @@ function parseMalformedRSS(xml: string): any[] {
     return items;
 }
 
-async function fetchOgImage(url: string): Promise<string | null> {
+async function fetchOgImage(url: string, depth = 0): Promise<string | null> {
+    if (depth > 2 || !url || !url.startsWith('http')) return null;
+
     try {
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            },
+            redirect: 'follow'
         });
         if (!response.ok) return null;
+
+        const finalUrl = response.url || url;
         const html = await response.text();
-        const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
-            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-        return ogImageMatch ? ogImageMatch[1] : null;
+
+        // If Google News redirect wrapper, try to locate original publisher link in canonical tag or anchor tag
+        if (finalUrl.includes('news.google.com') || finalUrl.includes('google.com')) {
+            const canonicalMatch = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i) ||
+                                  html.match(/<a[^>]+href=["'](https?:\/\/(?!news\.google\.com|www\.google\.com|play\.google\.com)[^"']+)["']/i);
+
+            if (canonicalMatch && canonicalMatch[1] && canonicalMatch[1] !== url) {
+                const publisherOg = await fetchOgImage(canonicalMatch[1], depth + 1);
+                if (publisherOg && !isGenericGoogleImage(publisherOg)) {
+                    return publisherOg;
+                }
+            }
+        }
+
+        const ogImageMatch =
+            html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+            html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+
+        const extracted = ogImageMatch ? ogImageMatch[1] : null;
+
+        if (extracted && !isGenericGoogleImage(extracted)) {
+            return extracted;
+        }
+
+        return null;
     } catch {
         return null;
     }
@@ -177,9 +228,10 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
         return await Promise.all(items.map(async (item, index) => {
             const snippet = item.contentSnippet || item.content || '';
             const category = determineCategory(item.title || 'trending', snippet);
-            let imageUrl = extractImage(item);
+            const finalCategory = category === 'trending' ? defaultCategory : category;
+            let imageUrl = extractImage(item, finalCategory);
 
-            if (imageUrl.includes('unsplash.com') && item.link && item.link.startsWith('http')) {
+            if ((imageUrl.includes('unsplash.com') || isGenericGoogleImage(imageUrl)) && item.link && item.link.startsWith('http')) {
                 const ogImg = await fetchOgImage(item.link);
                 if (ogImg) {
                     imageUrl = ogImg;
@@ -192,7 +244,7 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
                 description: snippet || 'No description available.',
                 source: sourceName,
                 isTrusted: TRUSTED_SOURCES.has(sourceName),
-                category: category === 'trending' ? defaultCategory : category,
+                category: finalCategory,
                 publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
                 url: item.link || '#',
                 imageUrl: imageUrl
