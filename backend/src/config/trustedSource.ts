@@ -1,0 +1,1 @@
+export const TRUSTED_SOURCES = new Set(['PIB', 'NDTV', 'Alt News Fact Check']);

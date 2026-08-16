@@ -3,6 +3,7 @@ import Parser from 'rss-parser';
 import { NewsItem } from '../types';
 import { env } from '../config/env';
 import { CATEGORY_KEYWORDS } from '../config/mapperRules';
+import { TRUSTED_SOURCES } from '../config/trustedSource';
 
 const parser = new Parser({
     headers: {
@@ -145,7 +146,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
         if (!response.ok) return null;
         const html = await response.text();
         const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
-                             html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
         return ogImageMatch ? ogImageMatch[1] : null;
     } catch {
         return null;
@@ -190,7 +191,7 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
                 title: item.title || 'Untitled Article',
                 description: snippet || 'No description available.',
                 source: sourceName,
-                isTrusted: sourceName === 'PIB',
+                isTrusted: TRUSTED_SOURCES.has(sourceName),
                 category: category === 'trending' ? defaultCategory : category,
                 publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
                 url: item.link || '#',
