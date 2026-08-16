@@ -11,7 +11,8 @@ const parser = new Parser({
     customFields: {
         item: [
             ['media:content', 'mediaContent'],
-            ['media:thumbnail', 'mediaThumbnail']
+            ['media:thumbnail', 'mediaThumbnail'],
+            ['content:encoded', 'contentEncoded']
         ]
     }
 });
@@ -86,8 +87,8 @@ function extractImage(item: any): string {
         return rawMedia.url;
     }
 
-    // 5. Scan HTML description/content for <img> tags
-    const html = `${item.content || ''} ${item.description || ''} ${item.contentSnippet || ''}`;
+    // 5. Scan HTML description/content (including contentEncoded) for <img> tags
+    const html = `${item.content || ''} ${item.description || ''} ${item.contentSnippet || ''} ${item.contentEncoded || ''}`;
     const imgRegex = /<img[^>]+src=["']([^"']+)["']/i;
     const match = html.match(imgRegex);
     if (match && match[1]) {
@@ -134,6 +135,23 @@ function parseMalformedRSS(xml: string): any[] {
     return items;
 }
 
+async function fetchOgImage(url: string): Promise<string | null> {
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        if (!response.ok) return null;
+        const html = await response.text();
+        const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                             html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+        return ogImageMatch ? ogImageMatch[1] : null;
+    } catch {
+        return null;
+    }
+}
+
 async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsItem['category']): Promise<NewsItem[]> {
     try {
         const response = await fetch(url, {
@@ -155,10 +173,17 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
             items = parseMalformedRSS(xmlText);
         }
 
-        return items.map((item, index) => {
+        return await Promise.all(items.map(async (item, index) => {
             const snippet = item.contentSnippet || item.content || '';
             const category = determineCategory(item.title || 'trending', snippet);
-            const imageUrl = extractImage(item);
+            let imageUrl = extractImage(item);
+
+            if (imageUrl.includes('unsplash.com') && item.link && item.link.startsWith('http')) {
+                const ogImg = await fetchOgImage(item.link);
+                if (ogImg) {
+                    imageUrl = ogImg;
+                }
+            }
 
             return {
                 id: item.guid || item.link || `${sourceName}-${index}-${Date.now()}`,
@@ -171,7 +196,7 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
                 url: item.link || '#',
                 imageUrl: imageUrl
             };
-        });
+        }));
     } catch (err) {
         console.error(`Failed to fetch RSS from ${sourceName}:`, err);
         return [];
