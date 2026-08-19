@@ -1,0 +1,313 @@
+/* VeracityGauge.css */
+
+.veracity-gauge-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.85rem;
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .veracity-gauge-container {
+        background: rgba(30, 41, 59, 0.45);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.veracity-gauge-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.15);
+}
+
+.veracity-gauge-container.high:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.25);
+}
+
+.veracity-gauge-container.mid:hover {
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.25);
+}
+
+.veracity-gauge-container.low:hover {
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.25);
+}
+
+/* SVG Chart Visual */
+.veracity-gauge-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.veracity-svg {
+    transform: rotate(-90deg);
+}
+
+.gauge-track {
+    fill: none;
+    stroke: rgba(148, 163, 184, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    .gauge-track {
+        stroke: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.gauge-progress {
+    fill: none;
+    transition: stroke-dashoffset 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Center Percentage Text inside circular gauge */
+.gauge-center-content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+}
+
+.gauge-percentage {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-h, #0f172a);
+}
+
+@media (prefers-color-scheme: dark) {
+    .gauge-percentage {
+        color: #f8fafc;
+    }
+}
+
+.gauge-mini-badge {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+    margin-top: 1px;
+}
+
+/* Label Group */
+.veracity-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.veracity-title {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.high {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}
+
+.status-dot.mid {
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+}
+
+.status-dot.low {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+
+.veracity-score-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-h, #0f172a);
+}
+
+@media (prefers-color-scheme: dark) {
+    .veracity-score-text {
+        color: #f1f5f9;
+    }
+}
+
+.veracity-subtext {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text, #64748b);
+    white-space: nowrap;
+}
+
+/* Popover Tooltip Breakdown */
+.veracity-breakdown-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, rgba(226, 232, 240, 0.9));
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.2), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+    padding: 1rem;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    animation: popoverFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .veracity-breakdown-popover {
+        background: #181c2b;
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7);
+    }
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.popover-header {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border, rgba(226, 232, 240, 0.8));
+}
+
+@media (prefers-color-scheme: dark) {
+    .popover-header {
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.popover-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.popover-status-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.popover-status-badge.high {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.popover-status-badge.mid {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.popover-status-badge.low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.popover-score-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent, #aa3bff);
+}
+
+.popover-explanation {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text, #64748b);
+    margin: 0;
+}
+
+/* Metric Bars */
+.popover-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.metric-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-h, #1e293b);
+}
+
+@media (prefers-color-scheme: dark) {
+    .metric-header {
+        color: #cbd5e1;
+    }
+}
+
+.metric-val {
+    font-weight: 700;
+    color: var(--accent, #aa3bff);
+}
+
+.metric-bar-bg {
+    height: 6px;
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .metric-bar-bg {
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.metric-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.metric-bar-fill.green {
+    background: linear-gradient(90deg, #10b981, #06b6d4);
+}
+
+.metric-bar-fill.blue {
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+.metric-bar-fill.purple {
+    background: linear-gradient(90deg, #8b5cf6, #d946ef);
+}

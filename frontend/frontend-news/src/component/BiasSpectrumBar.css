@@ -1,0 +1,301 @@
+/* BiasSpectrumBar.css */
+
+.bias-spectrum-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(148, 163, 184, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .bias-spectrum-container {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.bias-spectrum-container:hover {
+    background: rgba(148, 163, 184, 0.1);
+    border-color: var(--accent, #aa3bff);
+}
+
+.bias-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.bias-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.bias-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.bias-status-pill.left-badge {
+    background: rgba(59, 130, 246, 0.14);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.bias-status-pill.left-badge .bias-dot {
+    background: #3b82f6;
+    box-shadow: 0 0 6px #3b82f6;
+}
+
+.bias-status-pill.center-badge {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.bias-status-pill.center-badge .bias-dot {
+    background: #94a3b8;
+    box-shadow: 0 0 6px #94a3b8;
+}
+
+.bias-status-pill.right-badge {
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.bias-status-pill.right-badge .bias-dot {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+}
+
+.source-type-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text, #64748b);
+    opacity: 0.8;
+}
+
+/* Spectrum Track */
+.spectrum-track-wrapper {
+    position: relative;
+    height: 6px;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.spectrum-track {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .spectrum-track {
+        background: #1e293b;
+    }
+}
+
+.spectrum-zone {
+    flex: 1;
+    height: 100%;
+}
+
+.spectrum-zone.left {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    opacity: 0.7;
+}
+
+.spectrum-zone.center {
+    background: #94a3b8;
+    opacity: 0.5;
+}
+
+.spectrum-zone.right {
+    background: linear-gradient(90deg, #f87171, #ef4444);
+    opacity: 0.7;
+}
+
+/* Movable Indicator Marker */
+.spectrum-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.indicator-marker {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+.indicator-marker.left-badge {
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}
+
+.indicator-marker.center-badge {
+    background: #94a3b8;
+    box-shadow: 0 0 8px rgba(148, 163, 184, 0.8);
+}
+
+.indicator-marker.right-badge {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+
+/* Axis Labels */
+.spectrum-axis-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--text, #94a3b8);
+    opacity: 0.7;
+    padding: 0 2px;
+}
+
+.axis-label.left {
+    color: #3b82f6;
+}
+
+.axis-label.right {
+    color: #ef4444;
+}
+
+/* Popover Profile */
+.bias-popover {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 270px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, rgba(226, 232, 240, 0.9));
+    border-radius: 0.85rem;
+    padding: 0.85rem;
+    box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(12px);
+    z-index: 60;
+    animation: popoverSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .bias-popover {
+        background: #181c2b;
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.7);
+    }
+}
+
+@keyframes popoverSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bias-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.popover-source-title {
+    font-size: 0.85rem;
+    color: var(--text-h, #0f172a);
+}
+
+@media (prefers-color-scheme: dark) {
+    .popover-source-title {
+        color: #f1f5f9;
+    }
+}
+
+.popover-bias-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.35rem;
+}
+
+.popover-bias-desc {
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: var(--text, #64748b);
+    margin: 0 0 0.6rem 0;
+}
+
+.popover-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top: 1px solid var(--border, rgba(226, 232, 240, 0.6));
+    padding-top: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .popover-details {
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+}
+
+.detail-key {
+    color: var(--text, #64748b);
+    font-weight: 600;
+}
+
+.detail-val {
+    font-weight: 700;
+    color: var(--text-h, #0f172a);
+}
+
+@media (prefers-color-scheme: dark) {
+    .detail-val {
+        color: #cbd5e1;
+    }
+}
+
+.detail-link {
+    color: #06b6d4;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}

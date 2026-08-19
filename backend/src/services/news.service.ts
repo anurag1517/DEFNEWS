@@ -4,6 +4,8 @@ import { NewsItem } from '../types';
 import { env } from '../config/env';
 import { CATEGORY_KEYWORDS } from '../config/mapperRules';
 import { TRUSTED_SOURCES } from '../config/trustedSource';
+import { enrichNewsWithVeracity } from './veracity.service';
+import { enrichNewsWithBias } from './bias.service';
 
 const parser = new Parser({
     headers: {
@@ -243,12 +245,27 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
                 }
             }
 
+            // Detect recognized trusted source from title suffix e.g. "Title - WION"
+            let finalSourceName = sourceName;
+            const titleParts = (item.title || '').split(/\s*-\s*/);
+            if (titleParts.length > 1) {
+                const detectedPublisher = titleParts[titleParts.length - 1].trim();
+                for (const trusted of TRUSTED_SOURCES) {
+                    if (detectedPublisher.toLowerCase() === trusted.toLowerCase()) {
+                        finalSourceName = trusted;
+                        break;
+                    }
+                }
+            }
+
+            const isTrustedSource = TRUSTED_SOURCES.has(finalSourceName) || TRUSTED_SOURCES.has(sourceName);
+
             return {
-                id: item.guid || item.link || `${sourceName}-${index}-${Date.now()}`,
+                id: item.guid || item.link || `${finalSourceName}-${index}-${Date.now()}`,
                 title: item.title || 'Untitled Article',
                 description: snippet || 'No description available.',
-                source: sourceName,
-                isTrusted: TRUSTED_SOURCES.has(sourceName),
+                source: finalSourceName,
+                isTrusted: isTrustedSource,
                 category: finalCategory,
                 publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
                 url: item.link || '#',
@@ -262,38 +279,80 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
 }
 
 export async function scrapeAndCacheNews(): Promise<NewsItem[]> {
-    console.log('Ingesting latest news stories...');
+    console.log('Ingesting latest news stories across Left, Center, and Right spectrums...');
+    
+    // Core feeds
     const pibNews = await fetchRSS(env.pibFeedUrl, 'PIB', 'national');
     const googleNews = await fetchRSS(env.googleNewsFeedUrl, 'Google News India', 'trending');
     const ndtvNews = await fetchRSS(env.ndtvFeedUrl, 'NDTV', 'trending');
     const altNews = await fetchRSS(env.altNewsFeedUrl, 'Alt News Fact Check', 'trending');
     const googleTrends = await fetchRSS(env.googleTrendsFeedUrl, 'Google Trends India', 'trending');
 
+    // Public / Center feeds
+    const ddNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22DD+News%22&hl=en-IN&gl=IN&ceid=IN:en', 'DD News', 'national');
+    const theHinduNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22The+Hindu%22&hl=en-IN&gl=IN&ceid=IN:en', 'The Hindu', 'national');
+    const thePrintNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22ThePrint%22&hl=en-IN&gl=IN&ceid=IN:en', 'The Print', 'national');
+
+    // Left / Progressive feeds
+    const theWireNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22The+Wire%22&hl=en-IN&gl=IN&ceid=IN:en', 'The Wire', 'national');
+    const scrollNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22Scroll.in%22&hl=en-IN&gl=IN&ceid=IN:en', 'Scroll.in', 'national');
+
+    // Right / Conservative / Geopolitical feeds
+    const wionNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22WION%22&hl=en-IN&gl=IN&ceid=IN:en', 'WION', 'international');
+    const firstpostNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22Firstpost%22&hl=en-IN&gl=IN&ceid=IN:en', 'Firstpost', 'trending');
+    const opIndiaNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22OpIndia%22&hl=en-IN&gl=IN&ceid=IN:en', 'OpIndia', 'national');
+    const swarajyaNews = await fetchRSS('https://news.google.com/rss/search?q=when:2d+source:%22Swarajya%22&hl=en-IN&gl=IN&ceid=IN:en', 'Swarajya', 'national');
+
     // Combine and deduplicate
-    const combined = [...pibNews, ...googleNews, ...ndtvNews, ...altNews, ...googleTrends];
+    const combined = [
+        ...pibNews,
+        ...ddNews,
+        ...theHinduNews,
+        ...thePrintNews,
+        ...ndtvNews,
+        ...theWireNews,
+        ...scrollNews,
+        ...wionNews,
+        ...firstpostNews,
+        ...opIndiaNews,
+        ...swarajyaNews,
+        ...altNews,
+        ...googleNews,
+        ...googleTrends
+    ];
+
     const uniqueMap = new Map<string, NewsItem>();
     combined.forEach(item => uniqueMap.set(item.url, item));
     const uniqueArticles = Array.from(uniqueMap.values());
 
-    // Sort: Verified sources (isTrusted = true) first, then by date descending
-    uniqueArticles.sort((a, b) => {
-        if (a.isTrusted !== b.isTrusted) {
-            return a.isTrusted ? -1 : 1;
+    // 1. Enrich with veracity calculation (0-100% real/fake graph data) & incident origin date
+    const veracityEnriched = enrichNewsWithVeracity(uniqueArticles);
+
+    // 2. Enrich with ideological bias spectrum (Left, Center, Right, Handles)
+    const fullyEnrichedArticles = enrichNewsWithBias(veracityEnriched);
+
+    // Sort: Verified sources & high veracity score first, then by date descending
+    fullyEnrichedArticles.sort((a, b) => {
+        const scoreA = a.veracity?.score ?? (a.isTrusted ? 85 : 60);
+        const scoreB = b.veracity?.score ?? (b.isTrusted ? 85 : 60);
+        if (Math.abs(scoreB - scoreA) > 15) {
+            return scoreB - scoreA;
         }
         return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
     });
 
     // Cache results
-    memoryCache = uniqueArticles;
+    memoryCache = fullyEnrichedArticles;
     if (redisClient && redisClient.isOpen) {
-        await redisClient.set(REDIS_KEY, JSON.stringify(uniqueArticles));
-        console.log('Cached news in Redis.');
+        await redisClient.set(REDIS_KEY, JSON.stringify(fullyEnrichedArticles));
+        console.log(`Cached ${fullyEnrichedArticles.length} veracity & bias-scored news articles in Redis.`);
     } else {
-        console.log('Cached news in local memory.');
+        console.log(`Cached ${fullyEnrichedArticles.length} veracity & bias-scored news articles in local memory.`);
     }
 
-    return uniqueArticles;
+    return fullyEnrichedArticles;
 }
+
 
 export async function getCachedNews(): Promise<NewsItem[]> {
     if (redisClient && redisClient.isOpen) {

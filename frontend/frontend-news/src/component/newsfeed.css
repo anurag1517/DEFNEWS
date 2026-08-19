@@ -1,12 +1,140 @@
 /* newsfeed.css */
 
-.newsfeed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 2rem;
-  padding: 1.5rem 0;
+.newsfeed-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
 }
+
+.radar-filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Veracity & Bias Filter Bars */
+.veracity-filter-bar,
+.bias-filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 0.85rem;
+  box-shadow: var(--shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  .veracity-filter-bar,
+  .bias-filter-bar {
+    background: #181c2b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-h, #0f172a);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 105px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .filter-label {
+    color: #f1f5f9;
+  }
+}
+
+.filter-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  padding: 0.35rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--text, #64748b);
+  transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .filter-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+}
+
+.filter-chip:hover {
+  background: rgba(6, 182, 212, 0.12);
+  color: #06b6d4;
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.filter-chip.active {
+  background: #06b6d4;
+  color: #ffffff;
+  border-color: #06b6d4;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
+}
+
+.filter-chip.green.active {
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.filter-chip.amber.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+.filter-chip.red.active {
+  background: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.filter-chip.blue.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.filter-chip.gray.active {
+  background: #64748b;
+  border-color: #64748b;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.35);
+}
+
+.filter-chip.crimson.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.newsfeed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+
 
 /* Card Container */
 .news-card {
@@ -89,6 +217,15 @@
   flex-grow: 1;
 }
 
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
 .news-card-meta {
   display: flex;
   align-items: center;
@@ -96,8 +233,9 @@
   font-size: 0.8rem;
   color: var(--text);
   opacity: 0.85;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
+
 
 .news-card-source {
   font-weight: 700;
@@ -169,17 +307,45 @@
   flex-grow: 1;
 }
 
-/* Footer Link */
+.card-bias-row {
+  margin-bottom: 0.85rem;
+}
+
+/* Footer Link & Multi-Angle Button */
 .news-card-footer {
   margin-top: auto;
   border-top: 1px solid var(--border);
   padding-top: 1rem;
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.perspective-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  color: #06b6d4;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.perspective-modal-btn:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: #06b6d4;
+  transform: translateY(-1px);
 }
 
 .news-card-link {
   display: inline-flex;
+
   align-items: center;
   gap: 0.35rem;
   color: var(--text-h);

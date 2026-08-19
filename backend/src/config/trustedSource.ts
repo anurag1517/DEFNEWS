@@ -1,1 +1,25 @@
-export const TRUSTED_SOURCES = new Set(['PIB', 'NDTV', 'Alt News Fact Check']);
+export const TRUSTED_SOURCES = new Set([
+    'PIB',
+    'Doordarshan',
+    'DD News',
+    'DD India',
+    'WION',
+    'Firstpost',
+    'NDTV',
+    'Alt News Fact Check',
+    'The Hindu',
+    'The Indian Express',
+    'Indian Express',
+    'PTI',
+    'Press Trust of India',
+    'ANI',
+    'Asian News International',
+    'Reuters',
+    'BBC',
+    'BBC News India',
+    'Hindustan Times',
+    'Livemint',
+    'The Print',
+    'Scroll.in',
+    'The Wire'
+]);

@@ -1,0 +1,119 @@
+/* IncidentTimelineBadge.css */
+
+.incident-timeline-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px dashed rgba(148, 163, 184, 0.3);
+    border-radius: 0.75rem;
+    margin: 0.75rem 0;
+    transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    .incident-timeline-wrapper {
+        background: rgba(15, 23, 42, 0.55);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.incident-timeline-wrapper:hover {
+    background: rgba(148, 163, 184, 0.12);
+    border-color: var(--accent, #aa3bff);
+}
+
+.incident-timeline-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.timeline-node {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.timeline-icon {
+    flex-shrink: 0;
+}
+
+.timeline-node.origin .timeline-icon {
+    color: #3b82f6;
+}
+
+.timeline-node.report .timeline-icon {
+    color: #8b5cf6;
+}
+
+.node-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.node-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text, #64748b);
+    opacity: 0.8;
+}
+
+.node-date {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-h, #0f172a);
+}
+
+@media (prefers-color-scheme: dark) {
+    .node-date {
+        color: #f1f5f9;
+    }
+}
+
+.timeline-connector {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    color: var(--text, #94a3b8);
+    opacity: 0.6;
+}
+
+.connector-arrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Latency Status Pill */
+.incident-latency-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.4rem;
+    width: fit-content;
+}
+
+.incident-latency-pill.fresh {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.incident-latency-pill.delayed {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.incident-latency-pill.historical {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
