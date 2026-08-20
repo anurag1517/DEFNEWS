@@ -3,19 +3,16 @@ import './newsfeed.css';
 import type { NewsArticle, NewsFeedProps } from '../types/newsCard';
 import { VeracityGauge } from './VeracityGauge';
 import { IncidentTimelineBadge } from './IncidentTimelineBadge';
-// import { BiasSpectrumBar } from './BiasSpectrumBar';
-import { PerspectiveViewModal } from './PerspectiveViewModal';
+import { WayAheadModal } from './WayAheadModal';
 
 type VeracityFilter = 'all' | 'authentic' | 'likely' | 'caution';
-type BiasFilter = 'all' | 'left' | 'center' | 'right';
 
 export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
     const [articles, setArticles] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [veracityFilter, setVeracityFilter] = useState<VeracityFilter>('all');
-    const [biasFilter, setBiasFilter] = useState<BiasFilter>('all');
-    const [perspectiveModalArticle, setPerspectiveModalArticle] = useState<NewsArticle | null>(null);
+    const [wayAheadArticle, setWayAheadArticle] = useState<NewsArticle | null>(null);
 
     const fetchNews = async () => {
         setLoading(true);
@@ -59,19 +56,10 @@ export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
     const filteredArticles = articles.filter(article => {
         // Veracity filter check
         const vScore = article.veracity?.score ?? (article.isTrusted ? 85 : 60);
-        let matchesVeracity = true;
-        if (veracityFilter === 'authentic') matchesVeracity = vScore >= 80;
-        else if (veracityFilter === 'likely') matchesVeracity = vScore >= 60 && vScore < 80;
-        else if (veracityFilter === 'caution') matchesVeracity = vScore < 60;
-
-        // Bias filter check
-        const leaning = article.bias?.leaning || 'center';
-        let matchesBias = true;
-        if (biasFilter === 'left') matchesBias = leaning === 'left' || leaning === 'center-left';
-        else if (biasFilter === 'center') matchesBias = leaning === 'center';
-        else if (biasFilter === 'right') matchesBias = leaning === 'right' || leaning === 'center-right';
-
-        return matchesVeracity && matchesBias;
+        if (veracityFilter === 'authentic') return vScore >= 80;
+        if (veracityFilter === 'likely') return vScore >= 60 && vScore < 80;
+        if (veracityFilter === 'caution') return vScore < 60;
+        return true;
     });
 
     if (loading) {
@@ -210,7 +198,6 @@ export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
                     <button
                         onClick={() => {
                             setVeracityFilter('all');
-                            setBiasFilter('all');
                         }}
                         className="retry-button"
                     >
@@ -263,16 +250,15 @@ export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
 
                                 <div className="news-card-footer">
                                     <button
-                                        className="perspective-modal-btn"
-                                        onClick={() => setPerspectiveModalArticle(article)}
-                                        title="Compare how Left, Center, and Right cover this story"
+                                        className="wayahead-modal-btn"
+                                        onClick={() => setWayAheadArticle(article)}
+                                        title="Predict the path ahead & view summary so far using NLP"
                                     >
-                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                             <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="12" y1="2" x2="12" y2="22"></line>
-                                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                            <path d="M12 8l4 4-4 4M8 12h8"></path>
                                         </svg>
-                                        Multi-Angle Radar
+                                        Way Ahead
                                     </button>
 
                                     <a
@@ -294,12 +280,11 @@ export const NewsFeed = ({ currentCategory }: NewsFeedProps) => {
                 </div>
             )}
 
-            {/* Multi-Perspective Blindspot Modal */}
-            {perspectiveModalArticle && (
-                <PerspectiveViewModal
-                    article={perspectiveModalArticle}
-                    allArticles={articles}
-                    onClose={() => setPerspectiveModalArticle(null)}
+            {/* Way Ahead NLP Predictive Modal */}
+            {wayAheadArticle && (
+                <WayAheadModal
+                    article={wayAheadArticle}
+                    onClose={() => setWayAheadArticle(null)}
                 />
             )}
         </div>

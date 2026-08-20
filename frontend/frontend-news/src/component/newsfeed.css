@@ -322,25 +322,28 @@
   gap: 0.5rem;
 }
 
-.perspective-modal-btn {
+.wayahead-modal-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  color: #06b6d4;
-  padding: 0.4rem 0.75rem;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  padding: 0.45rem 0.85rem;
   border-radius: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.15);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.perspective-modal-btn:hover {
-  background: rgba(6, 182, 212, 0.2);
-  border-color: #06b6d4;
+.wayahead-modal-btn:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(168, 85, 247, 0.28));
+  border-color: #a855f7;
+  color: #f3e8ff;
   transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
 }
 
 .news-card-link {

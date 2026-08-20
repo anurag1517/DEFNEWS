@@ -30,6 +30,35 @@ export interface BiasInfo {
     youtubeChannel?: string;
 }
 
+export interface WayAheadStage {
+    phase: string;
+    timeline: string;
+    title: string;
+    description: string;
+    actionablePoints: string[];
+}
+
+export interface WayAheadInfo {
+    summarySoFar: {
+        headline: string;
+        overview: string;
+        keyFacts: string[];
+        keyEntities: string[];
+    };
+    wayAhead: {
+        domain: string;
+        forecastSummary: string;
+        stages: WayAheadStage[];
+        keyMilestones: string[];
+        potentialScenarios: {
+            baseline: string;
+            opportunity: string;
+            risk: string;
+        };
+        nlpConfidence: number;
+    };
+}
+
 export interface NewsArticle {
     id: string;
     title: string;
@@ -43,6 +72,7 @@ export interface NewsArticle {
     veracity?: VeracityInfo;
     incidentOrigin?: IncidentOriginInfo;
     bias?: BiasInfo;
+    wayAhead?: WayAheadInfo;
 }
 
 export interface NewsFeedProps {

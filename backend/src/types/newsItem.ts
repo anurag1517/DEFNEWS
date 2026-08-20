@@ -30,6 +30,35 @@ export interface BiasInfo {
     youtubeChannel?: string;
 }
 
+export interface WayAheadStage {
+    phase: string;               // e.g. "Immediate Phase (0–30 Days)", "Mid-Term Trajectory (1–6 Months)", "Long-Term Impact (6–24 Months)"
+    timeline: string;            // e.g. "0-30 Days", "1-6 Months", "6-24 Months"
+    title: string;               // Brief phase title
+    description: string;         // Detailed NLP prediction for this phase
+    actionablePoints: string[];  // Key concrete outcomes expected
+}
+
+export interface WayAheadInfo {
+    summarySoFar: {
+        headline: string;
+        overview: string;
+        keyFacts: string[];
+        keyEntities: string[];
+    };
+    wayAhead: {
+        domain: string;
+        forecastSummary: string;
+        stages: WayAheadStage[];
+        keyMilestones: string[];
+        potentialScenarios: {
+            baseline: string;
+            opportunity: string;
+            risk: string;
+        };
+        nlpConfidence: number;      // 0-100
+    };
+}
+
 export type NewsItem = {
     id: string;
     title: string;
@@ -43,5 +72,7 @@ export type NewsItem = {
     veracity?: VeracityInfo;
     incidentOrigin?: IncidentOriginInfo;
     bias?: BiasInfo;
+    wayAhead?: WayAheadInfo;
 };
+
 
