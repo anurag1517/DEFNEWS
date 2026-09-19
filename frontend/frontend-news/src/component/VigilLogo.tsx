@@ -82,9 +82,9 @@ export const VigilLogo: React.FC<VigilLogoProps> = ({
             {showText && (
                 <div className="vigil-brand-text">
                     <span className="vigil-title">
-                        VIGIL<span className="vigil-dot">.</span>
+                        SATARK<span className="vigil-dot">.</span>
                     </span>
-                    <span className="vigil-tagline">INTELLIGENCE</span>
+                    <span className="vigil-tagline"></span>
                 </div>
             )}
         </div>
