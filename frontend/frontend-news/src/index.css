@@ -51,8 +51,8 @@
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
@@ -125,6 +125,18 @@ code {
   text-align: left;
 }
 
+@media (max-width: 768px) {
+  .app-main {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-main {
+    padding: 1rem 0.75rem;
+  }
+}
+
 .feed-header-section {
   margin-bottom: 2rem;
   padding-bottom: 1.25rem;
@@ -179,6 +191,19 @@ code {
   text-transform: capitalize;
   letter-spacing: -0.03em;
   text-align: left;
+}
+
+@media (max-width: 768px) {
+  .feed-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .feed-title {
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+  }
 }
 
 .feed-title-highlight {

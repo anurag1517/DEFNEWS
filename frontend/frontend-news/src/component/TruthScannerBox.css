@@ -11,6 +11,14 @@
     overflow: hidden;
 }
 
+@media (max-width: 480px) {
+    .truth-scanner-card {
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-bottom: 1.25rem;
+    }
+}
+
 @media (prefers-color-scheme: dark) {
     .truth-scanner-card {
         background: #141724;
@@ -285,6 +293,20 @@
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .scanner-action-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .scanner-submit-btn,
+    .scanner-clear-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .scanner-clear-btn {

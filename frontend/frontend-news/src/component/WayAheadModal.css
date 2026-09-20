@@ -15,6 +15,13 @@
   animation: fadeIn 0.25s ease-out;
 }
 
+@media (max-width: 600px) {
+  .modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+}
+
 .wayahead-modal-content.chatbot-mode {
   background: linear-gradient(145deg, #0d1322 0%, #151d33 100%);
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -474,5 +481,60 @@
 
   .prompts-label {
     display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .wayahead-modal-content.chatbot-mode {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
+  .wayahead-modal-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .article-context-strip {
+    padding: 0.5rem 1rem;
+  }
+
+  .context-title {
+    font-size: 0.85rem;
+  }
+
+  .chat-scroll-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .quick-prompts-bar {
+    padding: 0.5rem 1rem;
+  }
+
+  .chips-wrapper {
+    gap: 0.4rem;
+  }
+
+  .chat-input-bar {
+    padding: 0.75rem 1rem;
+  }
+
+  .ai-model-pill {
+    display: none;
+  }
+
+  .chat-form {
+    gap: 0.5rem;
+  }
+
+  .chat-send-btn {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
+  .bubble-body {
+    font-size: 0.85rem;
   }
 }

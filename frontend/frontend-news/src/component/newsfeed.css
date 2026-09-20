@@ -44,6 +44,19 @@
   min-width: 105px;
 }
 
+@media (max-width: 480px) {
+  .filter-label {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .veracity-filter-bar,
+  .bias-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .filter-label {
     color: #f1f5f9;
@@ -134,7 +147,12 @@
   width: 100%;
 }
 
-
+@media (max-width: 768px) {
+  .newsfeed-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
 
 /* Card Container */
 .news-card {
