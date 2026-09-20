@@ -36,7 +36,7 @@ Cross-Referenced Historical Feed Archive:
 ${relatedText}
 
 Guidelines:
-1. Provide concise, clear, and structured answers formatted using Markdown (bolding, bullet points, headers).
+1. Provide concise, clear, and structured answers formatted using standard Markdown. ALWAYS use standard bullet points (- ) instead of '+' or other mixed characters. Keep formatting clean and consistent.
 2. When asked about "Way Ahead" or "Roadmap", structure your response into multi-phase timelines (Immediate: 0–30 Days, Mid-Term: 1–6 Months, Long-Term: 6–24 Months).
 3. When asked about "Implications", break down short-term operational impacts, long-term structural shifts, and strategic national/global policy impact.
 4. When asked about "Historical Context" or "Past Events", reference prior related stories from the feed archive or historical domain precedents.
