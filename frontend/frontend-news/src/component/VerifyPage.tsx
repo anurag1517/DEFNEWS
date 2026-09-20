@@ -152,10 +152,10 @@ export const VerifyPage: React.FC = () => {
                 </div>
                 <div>
                     <h1 className="verify-hero-title">
-                        VIGIL <span className="hero-accent">Credibility Scanner</span>
+                        SATARK <span className="hero-accent">Credibility Scanner</span>
                     </h1>
                     <p className="verify-hero-desc">
-                        Submit any link, video, image, or newspaper cutout — VIGIL analyses credibility,
+                        Submit any link, video, image, or newspaper cutout — SATARK analyses credibility,
                         political alignment, and incident origin date using multi-source intelligence.
                     </p>
                 </div>

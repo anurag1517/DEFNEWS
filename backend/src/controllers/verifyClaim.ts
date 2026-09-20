@@ -125,7 +125,7 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
         }
 
         if (matchedArticles.length > 0) {
-            riskFlags.push(`✅ Corroborated with ${matchedArticles.length} active coverage reports in VIGIL network.`);
+            riskFlags.push(`✅ Corroborated with ${matchedArticles.length} active coverage reports in SATARK network.`);
         } else {
             riskFlags.push('⚠️ Uncorroborated Claim: No matching reports from primary news wires currently found.');
         }
@@ -150,7 +150,7 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
                 url: a.url,
                 veracity: a.veracity
             })),
-            verdictSummary: `VIGIL Veracity Scanner computed a ${score}% credibility score for this submission (${label}). Source classified as ${bias.label}.`
+            verdictSummary: `SATARK Veracity Scanner computed a ${score}% credibility score for this submission (${label}). Source classified as ${bias.label}.`
         });
     } catch (error) {
         console.error('[API ERROR] Failed in verifyClaim controller:', error);

@@ -1,4 +1,4 @@
-# AI News Intelligence Platform (DEFNEWS)
+# AI News Intelligence Platform (SATARK)
 
 An enterprise-grade AI News Intelligence Platform that aggregates, categorizes, and filters news to identify misinformation and assess threat levels.
 

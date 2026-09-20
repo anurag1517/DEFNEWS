@@ -137,7 +137,7 @@ export const TruthScannerBox: React.FC = () => {
                         </svg>
                     </div>
                     <div>
-                        <h3 className="scanner-heading">VIGIL Truth Scanner &amp; Credibility Radar</h3>
+                        <h3 className="scanner-heading">SATARK Truth Scanner &amp; Credibility Radar</h3>
                         <p className="scanner-subheading">
                             Paste any text, newspaper cutout, video, photo, or link to inspect authenticity, incident date, and bias.
                         </p>

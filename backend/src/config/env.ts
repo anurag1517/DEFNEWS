@@ -34,5 +34,7 @@ export const env = {
     googleNewsFeedUrl: process.env.GOOGLE_NEWS_FEED_URL!,
     altNewsFeedUrl: process.env.ALT_NEWS_FEED_URL!,
     googleTrendsFeedUrl: process.env.GOOGLE_TRENDS_FEED_URL!,
-    frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    hfToken: process.env.HF_TOKEN ?? process.env.HUGGINGFACE_API_KEY,
+    hfModel: process.env.HF_MODEL ?? 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
 } as const;

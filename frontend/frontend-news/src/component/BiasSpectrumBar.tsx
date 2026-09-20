@@ -74,7 +74,7 @@ export const BiasSpectrumBar: React.FC<BiasSpectrumBarProps> = ({ bias, sourceNa
                     </div>
 
                     <p className="popover-bias-desc">
-                        {bias?.description || 'Independent editorial outlet cataloged by VIGIL Source Intelligence Radar.'}
+                        {bias?.description || 'Independent editorial outlet cataloged by SATARK Source Intelligence Radar.'}
                     </p>
 
                     <div className="popover-details">

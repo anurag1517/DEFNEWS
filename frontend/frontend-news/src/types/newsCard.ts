@@ -38,7 +38,25 @@ export interface WayAheadStage {
     actionablePoints: string[];
 }
 
+export interface NewsImplications {
+    shortTerm: string[];
+    longTerm: string[];
+    strategicImpact: string;
+}
+
+export interface HistoricalContextInfo {
+    summary: string;
+    relatedArticles: Array<{
+        title: string;
+        source: string;
+        publishedAt: string;
+    }>;
+}
+
 export interface WayAheadInfo {
+    aiModelUsed?: string;
+    implications?: NewsImplications;
+    historicalContext?: HistoricalContextInfo;
     summarySoFar: {
         headline: string;
         overview: string;

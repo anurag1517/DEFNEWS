@@ -183,7 +183,7 @@ async function fetchOgImage(url: string, depth = 0): Promise<string | null> {
         // If Google News redirect wrapper, try to locate original publisher link in canonical tag or anchor tag
         if (finalUrl.includes('news.google.com') || finalUrl.includes('google.com')) {
             const canonicalMatch = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i) ||
-                                  html.match(/<a[^>]+href=["'](https?:\/\/(?!news\.google\.com|www\.google\.com|play\.google\.com)[^"']+)["']/i);
+                html.match(/<a[^>]+href=["'](https?:\/\/(?!news\.google\.com|www\.google\.com|play\.google\.com)[^"']+)["']/i);
 
             if (canonicalMatch && canonicalMatch[1] && canonicalMatch[1] !== url) {
                 const publisherOg = await fetchOgImage(canonicalMatch[1], depth + 1);
@@ -280,7 +280,7 @@ async function fetchRSS(url: string, sourceName: string, defaultCategory: NewsIt
 
 export async function scrapeAndCacheNews(): Promise<NewsItem[]> {
     console.log('Ingesting latest news stories across Left, Center, and Right spectrums...');
-    
+
     // Core feeds
     const pibNews = await fetchRSS(env.pibFeedUrl, 'PIB', 'national');
     const googleNews = await fetchRSS(env.googleNewsFeedUrl, 'Google News India', 'trending');
