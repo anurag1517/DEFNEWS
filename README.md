@@ -2,6 +2,8 @@
 
 An enterprise-grade AI News Intelligence Platform that aggregates, categorizes, and filters news to identify misinformation and assess threat levels.
 
+> 📖 **Comprehensive Documentation**: For a deep-dive into the system architecture, all backend & frontend functions, and full API endpoint references with request/response schemas, check out [**`SATARK_DOCS.md`**](file:///Users/anurag/Documents/news/SATARK_DOCS.md).
+
 ## Run Directly in Your Browser (No Cloning Required)
 
 You can run and preview the frontend of this application instantly in your browser without any local setup or cloning:

@@ -6,6 +6,7 @@ import {
     extractIncidentOrigin
 } from "../services/veracity.service";
 import { evaluateArticleBias } from "../services/bias.service";
+import { analyzeClaimWithAI } from "../services/hfInference.service";
 import { VeracityInfo, VeracityBreakdown } from "../types/newsItem";
 
 export async function verifyClaim(req: Request, res: Response, next: NextFunction) {
@@ -134,6 +135,16 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
             riskFlags.push('🚩 Linguistic Alert: High density of sensationalized / clickbait emotional framing.');
         }
 
+        // 6. Run AI analysis in parallel (non-blocking — fails gracefully)
+        const aiAnalysis = await analyzeClaimWithAI({
+            headline: title,
+            submittedText: description,
+            source: detectedSource,
+            inputType: type,
+            matchedArticles: matchedArticles.map(a => ({ title: a.title, source: a.source })),
+            heuristicScore: score
+        }).catch(() => null);
+
         res.json({
             success: true,
             inputType: type,
@@ -143,6 +154,7 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
             incidentOrigin,
             bias,
             riskFlags,
+            aiAnalysis: aiAnalysis ?? null,
             matchedArticles: matchedArticles.map(a => ({
                 id: a.id,
                 title: a.title,
@@ -150,8 +162,11 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
                 url: a.url,
                 veracity: a.veracity
             })),
-            verdictSummary: `SATARK Veracity Scanner computed a ${score}% credibility score for this submission (${label}). Source classified as ${bias.label}.`
+            verdictSummary: aiAnalysis
+                ? `SATARK AI: ${aiAnalysis.reasoning} Source classified as ${bias.label}.`
+                : `SATARK Veracity Scanner computed a ${score}% credibility score for this submission (${label}). Source classified as ${bias.label}.`
         });
+
     } catch (error) {
         console.error('[API ERROR] Failed in verifyClaim controller:', error);
         next(error);

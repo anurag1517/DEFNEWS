@@ -7,6 +7,15 @@ import './VerifyPage.css';
 
 type InputMode = 'link' | 'image';
 
+interface AIAnalysis {
+    credibilityScore: number;
+    verdict: string;
+    reasoning: string;
+    redFlags: string[];
+    recommendation: string;
+    modelUsed: string;
+}
+
 interface VerificationResult {
     success: boolean;
     inputType: string;
@@ -16,6 +25,7 @@ interface VerificationResult {
     incidentOrigin: IncidentOriginInfo;
     bias: BiasInfo;
     riskFlags: string[];
+    aiAnalysis: AIAnalysis | null;
     matchedArticles: Array<{
         id: string;
         title: string;
@@ -416,7 +426,7 @@ export const VerifyPage: React.FC = () => {
                                     <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
                                     <line x1="4" y1="22" x2="4" y2="15"></line>
                                 </svg>
-                                VIGIL Intelligence Flags
+                                SATARK Intelligence Flags
                             </h3>
                             <ul className="intel-flags-list">
                                 {result.riskFlags.map((flag, idx) => (
@@ -432,7 +442,7 @@ export const VerifyPage: React.FC = () => {
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="#10b981" strokeWidth="2" fill="none">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
-                                    Corroborated by VIGIL Network ({result.matchedArticles.length} active reports)
+                                    Corroborated by SATARK Network ({result.matchedArticles.length} active reports)
                                 </h3>
                                 <div className="matched-grid">
                                     {result.matchedArticles.map(m => (
@@ -452,7 +462,71 @@ export const VerifyPage: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Verdict Summary */}
+                        {/* AI Analysis Panel */}
+                        {result.aiAnalysis && (
+                            <div className="intel-flags-panel" style={{ borderColor: 'rgba(168,85,247,0.25)', background: 'rgba(168,85,247,0.04)' }}>
+                                <h3 className="intel-panel-title" style={{ color: '#c084fc' }}>
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="#a855f7" strokeWidth="2" fill="none">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 8v4l3 3"></path>
+                                    </svg>
+                                    AI Analysis
+                                    <span style={{ marginLeft: 'auto', fontSize: '0.68rem', fontWeight: 600, color: '#94a3b8', fontStyle: 'italic' }}>
+                                        {result.aiAnalysis.modelUsed}
+                                    </span>
+                                </h3>
+
+                                {/* AI Score badge */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                                    <span style={{
+                                        fontSize: '1.5rem', fontWeight: 900,
+                                        color: result.aiAnalysis.credibilityScore >= 80 ? '#10b981'
+                                            : result.aiAnalysis.credibilityScore >= 60 ? '#f59e0b'
+                                            : result.aiAnalysis.credibilityScore >= 45 ? '#f97316' : '#ef4444'
+                                    }}>
+                                        {result.aiAnalysis.credibilityScore}%
+                                    </span>
+                                    <span style={{
+                                        fontSize: '0.75rem', fontWeight: 800, padding: '0.2rem 0.6rem',
+                                        borderRadius: '0.4rem',
+                                        background: result.aiAnalysis.credibilityScore >= 80 ? 'rgba(16,185,129,0.12)'
+                                            : result.aiAnalysis.credibilityScore >= 60 ? 'rgba(245,158,11,0.12)'
+                                            : result.aiAnalysis.credibilityScore >= 45 ? 'rgba(249,115,22,0.12)' : 'rgba(239,68,68,0.12)',
+                                        color: result.aiAnalysis.credibilityScore >= 80 ? '#10b981'
+                                            : result.aiAnalysis.credibilityScore >= 60 ? '#f59e0b'
+                                            : result.aiAnalysis.credibilityScore >= 45 ? '#f97316' : '#ef4444',
+                                    }}>
+                                        {result.aiAnalysis.verdict}
+                                    </span>
+                                </div>
+
+                                {/* Reasoning */}
+                                {result.aiAnalysis.reasoning && (
+                                    <p style={{ fontSize: '0.85rem', lineHeight: 1.55, color: 'var(--text)', margin: '0 0 0.6rem 0' }}>
+                                        {result.aiAnalysis.reasoning}
+                                    </p>
+                                )}
+
+                                {/* Red Flags */}
+                                {result.aiAnalysis.redFlags.length > 0 && (
+                                    <ul className="intel-flags-list" style={{ marginBottom: '0.6rem' }}>
+                                        {result.aiAnalysis.redFlags.map((f, i) => (
+                                            <li key={i} className="intel-flag-item" style={{ borderLeft: '3px solid rgba(239,68,68,0.5)' }}>
+                                                🚩 {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                {/* Recommendation */}
+                                {result.aiAnalysis.recommendation && (
+                                    <div className="intel-flag-item" style={{ borderLeft: '3px solid rgba(16,185,129,0.5)', background: 'rgba(16,185,129,0.06)' }}>
+                                        💡 {result.aiAnalysis.recommendation}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="verdict-summary-footer">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="#06b6d4" strokeWidth="2" fill="none">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
