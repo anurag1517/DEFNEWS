@@ -16,6 +16,48 @@ interface AIAnalysis {
     modelUsed: string;
 }
 
+// ── Markdown renderer (mirrors WayAheadModal) ──────────────────────────────
+const parseBold = (text: string): React.ReactNode[] => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i}>{part.slice(2, -2)}</strong>;
+        }
+        return part;
+    });
+};
+
+const renderMarkdown = (content: string): React.ReactNode[] => {
+    const lines = content.split('\n');
+    return lines.map((line, index) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={index} className="chat-spacer" />;
+        if (trimmed.startsWith('### ')) return <h4 key={index} className="chat-h4">{trimmed.replace(/^###\s+/, '')}</h4>;
+        if (trimmed.startsWith('## '))  return <h3 key={index} className="chat-h3">{trimmed.replace(/^##\s+/, '')}</h3>;
+        if (trimmed.startsWith('# '))   return <h2 key={index} className="chat-h2">{trimmed.replace(/^#\s+/, '')}</h2>;
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+            return (
+                <div key={index} className="chat-bullet-item">
+                    <span className="bullet-dot">•</span>
+                    <span>{parseBold(trimmed.slice(2))}</span>
+                </div>
+            );
+        }
+        if (trimmed.startsWith('> ')) return <blockquote key={index} className="chat-quote">{parseBold(trimmed.slice(2))}</blockquote>;
+        return <p key={index} className="chat-paragraph">{parseBold(trimmed)}</p>;
+    });
+};
+
+const formatReadableDate = (iso: string): string => {
+    try {
+        return new Date(iso).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    } catch {
+        return iso;
+    }
+};
+
 interface VerificationResult {
     success: boolean;
     inputType: string;
@@ -316,7 +358,7 @@ export const VerifyPage: React.FC = () => {
                         {isScanning ? (
                             <>
                                 <span className="scan-spinner" />
-                                <span>Running VIGIL Radar Scan...</span>
+                                <span>Running Scan...</span>
                             </>
                         ) : (
                             <>
@@ -324,214 +366,61 @@ export const VerifyPage: React.FC = () => {
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
-                                <span>Scan &amp; Analyse Credibility</span>
+                                <span>Run Scan</span>
                             </>
                         )}
                     </button>
                 </div>
             </div>
 
-            {/* ── Results Dashboard ───────────────────────────────── */}
+            {/* ── Results ─────────────────────────────────────────── */}
             {result && (() => {
-                const score = result.veracity.score;
-                const verdict = getVerdictConfig(score);
+                const verdict = getVerdictConfig(result.veracity.score);
+                const hasReasoning = !!result.aiAnalysis?.reasoning;
                 return (
-                    <div className="verify-results-dashboard">
+                    <div className="satark-response-block">
 
-                        {/* Hero Verdict Banner */}
-                        <div className="verdict-hero-banner" style={{
-                            background: verdict.bg,
-                            borderColor: verdict.border
-                        }}>
-                            <div className="verdict-left">
-                                <span className="verdict-label-small">VIGIL VERDICT</span>
-                                <h2 className="verdict-label-main" style={{ color: verdict.color }}>
-                                    {verdict.label}
-                                </h2>
-                                <p className="verdict-headline">{result.analyzedHeadline}</p>
-                                <span className="verdict-source">
-                                    Source: <strong>{result.analyzedSource}</strong>
+                        {/* Header: avatar + verdict pill */}
+                        <div className="satark-response-header">
+                            <div className="satark-avatar">🤖</div>
+                            <div>
+                                <span className="satark-sender-name">SATARK AI</span>
+                                <span className="satark-timestamp">{formatReadableDate(result.incidentOrigin.publishedDate)}</span>
+                            </div>
+                            <span className="satark-verdict-pill" style={{ background: verdict.bg, color: verdict.color, borderColor: verdict.border }}>
+                                {verdict.label}
+                            </span>
+                        </div>
+
+                        {/* Body: pure prose */}
+                        <div className="satark-response-body">
+
+                            {/* AI reasoning — main content */}
+                            {hasReasoning ? (
+                                <div className="satark-md-body">
+                                    {renderMarkdown(result.aiAnalysis!.reasoning)}
+                                </div>
+                            ) : (
+                                <p className="satark-prose">{result.verdictSummary}</p>
+                            )}
+
+                            {/* Footer: source + date */}
+                            <div className="satark-meta-footer">
+                                <span className="satark-meta-source">
+                                    📰 {result.analyzedSource}
                                 </span>
-                            </div>
-                            <div className="verdict-gauge-wrap">
-                                <VeracityGauge veracity={result.veracity} />
-                            </div>
-                        </div>
-
-                        {/* Metrics Row: Breakdown bars */}
-                        <div className="breakdown-row">
-                            {[
-                                { label: 'Source Authority', val: result.veracity.breakdown.sourceAuthority, color: '#06b6d4' },
-                                { label: 'Cross-Verification', val: result.veracity.breakdown.crossVerification, color: '#6366f1' },
-                                { label: 'Content Analysis', val: result.veracity.breakdown.contentAnalysis, color: '#10b981' },
-                            ].map(({ label, val, color }) => (
-                                <div className="breakdown-metric-card" key={label}>
-                                    <div className="bmc-header">
-                                        <span className="bmc-label">{label}</span>
-                                        <span className="bmc-pct" style={{ color }}>{val}%</span>
-                                    </div>
-                                    <div className="bmc-track">
-                                        <div className="bmc-fill" style={{ width: `${val}%`, background: color }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Two-column: Alignment + Timeline */}
-                        <div className="two-col-metrics">
-                            {/* Political & Media Alignment - Commented out */}
-                            {/* 
-                            <div className="metric-panel">
-                                <span className="panel-title">⚖️ Political &amp; Media Alignment</span>
-                                <BiasSpectrumBar
-                                    bias={result.bias}
-                                    sourceName={result.analyzedSource}
-                                />
-                                <div className="alignment-description">
-                                    <span className="align-label-badge" style={{
-                                        color: result.bias?.leaning?.startsWith('left') ? '#3b82f6'
-                                            : result.bias?.leaning === 'center' ? '#94a3b8'
-                                            : '#ef4444',
-                                        background: result.bias?.leaning?.startsWith('left') ? 'rgba(59,130,246,0.12)'
-                                            : result.bias?.leaning === 'center' ? 'rgba(148,163,184,0.12)'
-                                            : 'rgba(239,68,68,0.12)',
-                                    }}>
-                                        {result.bias?.label || 'Center / Balanced'}
-                                    </span>
-                                    <p className="align-desc-text">{result.bias?.description}</p>
-                                </div>
-                            </div>
-                            */}
-
-                            <div className="metric-panel full-width-metric">
-                                <span className="panel-title">⏱️ Incident Origin &amp; Timeline</span>
-                                <IncidentTimelineBadge
-                                    incidentOrigin={result.incidentOrigin}
-                                    publishedAt={result.incidentOrigin.publishedDate}
-                                />
-                                <div className="timeline-note">
-                                    {result.incidentOrigin.latencyDays > 5
-                                        ? `⚠️ This incident originated ~${result.incidentOrigin.latencyDays} days before publication. May be recycled or re-shared content.`
-                                        : result.incidentOrigin.latencyDays > 0
-                                        ? `ℹ️ Event occurred ${result.incidentOrigin.latencyDays} day(s) before report — normal news lag.`
-                                        : '⚡ Real-time or same-day coverage detected.'}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Intelligence Flags */}
-                        <div className="intel-flags-panel">
-                            <h3 className="intel-panel-title">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="#06b6d4" strokeWidth="2" fill="none">
-                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                    <line x1="4" y1="22" x2="4" y2="15"></line>
-                                </svg>
-                                SATARK Intelligence Flags
-                            </h3>
-                            <ul className="intel-flags-list">
-                                {result.riskFlags.map((flag, idx) => (
-                                    <li key={idx} className="intel-flag-item">{flag}</li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Corroborated Matches */}
-                        {result.matchedArticles.length > 0 && (
-                            <div className="matched-coverage-panel">
-                                <h3 className="matched-panel-title">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="#10b981" strokeWidth="2" fill="none">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                    Corroborated by SATARK Network ({result.matchedArticles.length} active reports)
-                                </h3>
-                                <div className="matched-grid">
-                                    {result.matchedArticles.map(m => (
-                                        <a
-                                            key={m.id}
-                                            href={m.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="matched-card"
-                                        >
-                                            <span className="matched-source">{m.source}</span>
-                                            <span className="matched-title">{m.title.slice(0, 90)}...</span>
-                                            <span className="matched-read">Read ↗</span>
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* AI Analysis Panel */}
-                        {result.aiAnalysis && (
-                            <div className="intel-flags-panel" style={{ borderColor: 'rgba(168,85,247,0.25)', background: 'rgba(168,85,247,0.04)' }}>
-                                <h3 className="intel-panel-title" style={{ color: '#c084fc' }}>
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="#a855f7" strokeWidth="2" fill="none">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M12 8v4l3 3"></path>
-                                    </svg>
-                                    AI Analysis
-                                    <span style={{ marginLeft: 'auto', fontSize: '0.68rem', fontWeight: 600, color: '#94a3b8', fontStyle: 'italic' }}>
-                                        {result.aiAnalysis.modelUsed}
-                                    </span>
-                                </h3>
-
-                                {/* AI Score badge */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                                    <span style={{
-                                        fontSize: '1.5rem', fontWeight: 900,
-                                        color: result.aiAnalysis.credibilityScore >= 80 ? '#10b981'
-                                            : result.aiAnalysis.credibilityScore >= 60 ? '#f59e0b'
-                                            : result.aiAnalysis.credibilityScore >= 45 ? '#f97316' : '#ef4444'
-                                    }}>
-                                        {result.aiAnalysis.credibilityScore}%
-                                    </span>
-                                    <span style={{
-                                        fontSize: '0.75rem', fontWeight: 800, padding: '0.2rem 0.6rem',
-                                        borderRadius: '0.4rem',
-                                        background: result.aiAnalysis.credibilityScore >= 80 ? 'rgba(16,185,129,0.12)'
-                                            : result.aiAnalysis.credibilityScore >= 60 ? 'rgba(245,158,11,0.12)'
-                                            : result.aiAnalysis.credibilityScore >= 45 ? 'rgba(249,115,22,0.12)' : 'rgba(239,68,68,0.12)',
-                                        color: result.aiAnalysis.credibilityScore >= 80 ? '#10b981'
-                                            : result.aiAnalysis.credibilityScore >= 60 ? '#f59e0b'
-                                            : result.aiAnalysis.credibilityScore >= 45 ? '#f97316' : '#ef4444',
-                                    }}>
-                                        {result.aiAnalysis.verdict}
-                                    </span>
-                                </div>
-
-                                {/* Reasoning */}
-                                {result.aiAnalysis.reasoning && (
-                                    <p style={{ fontSize: '0.85rem', lineHeight: 1.55, color: 'var(--text)', margin: '0 0 0.6rem 0' }}>
-                                        {result.aiAnalysis.reasoning}
-                                    </p>
-                                )}
-
-                                {/* Red Flags */}
-                                {result.aiAnalysis.redFlags.length > 0 && (
-                                    <ul className="intel-flags-list" style={{ marginBottom: '0.6rem' }}>
-                                        {result.aiAnalysis.redFlags.map((f, i) => (
-                                            <li key={i} className="intel-flag-item" style={{ borderLeft: '3px solid rgba(239,68,68,0.5)' }}>
-                                                🚩 {f}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                {/* Recommendation */}
-                                {result.aiAnalysis.recommendation && (
-                                    <div className="intel-flag-item" style={{ borderLeft: '3px solid rgba(16,185,129,0.5)', background: 'rgba(16,185,129,0.06)' }}>
-                                        💡 {result.aiAnalysis.recommendation}
-                                    </div>
+                                <span className="satark-meta-sep">·</span>
+                                <span className="satark-meta-date">
+                                    Published {formatReadableDate(result.incidentOrigin.publishedDate)}
+                                </span>
+                                {result.aiAnalysis?.modelUsed && (
+                                    <>
+                                        <span className="satark-meta-sep">·</span>
+                                        <span className="satark-model-tag">{result.aiAnalysis.modelUsed}</span>
+                                    </>
                                 )}
                             </div>
-                        )}
 
-                        <div className="verdict-summary-footer">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="#06b6d4" strokeWidth="2" fill="none">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                            <p>{result.verdictSummary}</p>
                         </div>
                     </div>
                 );

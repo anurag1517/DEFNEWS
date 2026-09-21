@@ -782,3 +782,476 @@
     font-style: italic;
     margin: 0;
 }
+
+/* ── AI Analysis Markdown Body ─────────────────────────────── */
+.ai-analysis-body {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text, #94a3b8);
+    margin-bottom: 0.75rem;
+}
+
+.ai-analysis-body .chat-paragraph {
+    margin: 0 0 0.6rem 0;
+    color: var(--text, #cbd5e1);
+    font-size: 0.88rem;
+    line-height: 1.65;
+}
+
+.ai-analysis-body .chat-h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c084fc;
+    margin: 0.8rem 0 0.4rem 0;
+}
+
+.ai-analysis-body .chat-h3 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #a78bfa;
+    margin: 0.6rem 0 0.3rem 0;
+}
+
+.ai-analysis-body .chat-h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin: 0.5rem 0 0.25rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ai-analysis-body .chat-bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.3rem 0;
+    font-size: 0.87rem;
+    color: var(--text, #cbd5e1);
+    line-height: 1.55;
+}
+
+.ai-analysis-body .bullet-dot {
+    color: #a855f7;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ai-analysis-body .chat-quote {
+    border-left: 3px solid rgba(168,85,247,0.5);
+    padding: 0.3rem 0.75rem;
+    margin: 0.4rem 0;
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.85rem;
+    background: rgba(168,85,247,0.05);
+    border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.ai-analysis-body .chat-spacer {
+    height: 0.5rem;
+}
+
+/* AI section labels */
+.ai-section-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #ef4444;
+    margin-bottom: 0.5rem;
+}
+
+.ai-red-flags-section {
+    margin-top: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SATARK LLM-Style Response Block
+═══════════════════════════════════════════════════════════════ */
+
+.satark-response-block {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+}
+
+/* ── Header row ── */
+.satark-response-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(99,102,241,0.06);
+    flex-wrap: wrap;
+}
+
+.satark-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}
+
+.satark-sender-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #c7d2fe;
+    letter-spacing: 0.01em;
+}
+
+.satark-timestamp {
+    display: block;
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 1px;
+}
+
+.satark-verdict-pill {
+    margin-left: auto;
+    padding: 0.28rem 0.85rem;
+    border-radius: 2rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+/* ── Body ── */
+.satark-response-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Intro line ── */
+.satark-intro-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+}
+
+.satark-score-badge {
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.satark-divider {
+    color: #334155;
+}
+
+.satark-source-label {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.satark-source-label strong {
+    color: #94a3b8;
+}
+
+.satark-headline-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+    font-style: italic;
+    border-left: 3px solid rgba(99,102,241,0.5);
+    padding-left: 0.85rem;
+}
+
+/* ── Sections ── */
+.satark-section {
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.satark-section:first-of-type {
+    border-top: none;
+}
+
+.satark-section-title {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 0.65rem;
+}
+
+/* ── Markdown body inside satark block ── */
+.satark-md-body {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+}
+
+.satark-md-body .chat-paragraph {
+    margin: 0 0 0.5rem 0;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.satark-md-body .chat-h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    margin: 0.8rem 0 0.35rem 0;
+}
+
+.satark-md-body .chat-h3 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #818cf8;
+    margin: 0.65rem 0 0.3rem 0;
+}
+
+.satark-md-body .chat-h4 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0.5rem 0 0.2rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.satark-md-body .chat-bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.satark-md-body .bullet-dot {
+    color: #6366f1;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.satark-md-body .chat-quote {
+    border-left: 3px solid rgba(99,102,241,0.4);
+    padding: 0.3rem 0.75rem;
+    margin: 0.4rem 0;
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.87rem;
+    background: rgba(99,102,241,0.05);
+    border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.satark-md-body .chat-spacer {
+    height: 0.4rem;
+}
+
+/* ── Prose paragraph ── */
+.satark-prose {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* ── Score bars (inline in body) ── */
+.satark-score-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.satark-score-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.satark-score-label {
+    width: 145px;
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.satark-score-bar-wrap {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.satark-score-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.satark-score-pct {
+    font-size: 0.82rem;
+    font-weight: 700;
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ── Flag lines ── */
+.satark-flag-line {
+    font-size: 0.87rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    padding: 0.25rem 0;
+}
+
+.satark-flag-red {
+    color: #fca5a5;
+}
+
+/* ── Article links ── */
+.satark-article-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.satark-article-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.6rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    text-decoration: none;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    flex-wrap: wrap;
+}
+
+.satark-article-link:hover {
+    background: rgba(99,102,241,0.08);
+    border-color: rgba(99,102,241,0.25);
+}
+
+.satark-link-source {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.satark-link-title {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.satark-link-arrow {
+    font-size: 0.75rem;
+    color: #475569;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.satark-article-link:hover .satark-link-arrow {
+    color: #818cf8;
+}
+
+/* ── Recommendation section ── */
+.satark-recommendation {
+    background: rgba(16,185,129,0.04);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem !important;
+    border-top: none !important;
+    border: 1px solid rgba(16,185,129,0.15);
+    margin-top: 0.5rem;
+}
+
+.satark-recommendation .satark-md-body .chat-paragraph {
+    color: #6ee7b7;
+}
+
+.satark-recommendation .satark-md-body .bullet-dot {
+    color: #10b981;
+}
+
+/* ── Footer note ── */
+.satark-footer-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.78rem;
+    color: #475569;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.satark-footer-note svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.satark-model-tag {
+    color: #334155;
+    margin-left: 0.25rem;
+    white-space: nowrap;
+}
+
+/* ── Meta footer: source + date ── */
+.satark-meta-footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.78rem;
+    color: #475569;
+}
+
+.satark-meta-source {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.satark-meta-date {
+    color: #475569;
+}
+
+.satark-meta-sep {
+    color: #334155;
+}
+
+@media (max-width: 600px) {
+    .satark-response-body { padding: 1rem; }
+    .satark-score-label { width: 110px; font-size: 0.75rem; }
+    .satark-verdict-pill { margin-left: 0; }
+    .satark-article-link { flex-direction: column; align-items: flex-start; }
+}
