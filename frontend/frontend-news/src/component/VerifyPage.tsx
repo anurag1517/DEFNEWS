@@ -1,6 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { VeracityGauge } from './VeracityGauge';
-import { IncidentTimelineBadge } from './IncidentTimelineBadge';
 // import { BiasSpectrumBar } from './BiasSpectrumBar';
 import type { VeracityInfo, IncidentOriginInfo, BiasInfo } from '../types/newsCard';
 import './VerifyPage.css';
@@ -33,8 +31,8 @@ const renderMarkdown = (content: string): React.ReactNode[] => {
         const trimmed = line.trim();
         if (!trimmed) return <div key={index} className="chat-spacer" />;
         if (trimmed.startsWith('### ')) return <h4 key={index} className="chat-h4">{trimmed.replace(/^###\s+/, '')}</h4>;
-        if (trimmed.startsWith('## '))  return <h3 key={index} className="chat-h3">{trimmed.replace(/^##\s+/, '')}</h3>;
-        if (trimmed.startsWith('# '))   return <h2 key={index} className="chat-h2">{trimmed.replace(/^#\s+/, '')}</h2>;
+        if (trimmed.startsWith('## ')) return <h3 key={index} className="chat-h3">{trimmed.replace(/^##\s+/, '')}</h3>;
+        if (trimmed.startsWith('# ')) return <h2 key={index} className="chat-h2">{trimmed.replace(/^#\s+/, '')}</h2>;
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
             return (
                 <div key={index} className="chat-bullet-item">
