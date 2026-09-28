@@ -124,6 +124,7 @@
   50% { box-shadow: 0 4px 22px rgba(6, 182, 212, 0.7), 0 0 0 5px rgba(6, 182, 212, 0.12); }
 }
 
+
 @media (max-width: 768px) {
   .navbar-container {
     padding: 0 1rem;

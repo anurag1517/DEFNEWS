@@ -125,6 +125,7 @@ code {
   text-align: left;
 }
 
+
 @media (max-width: 768px) {
   .app-main {
     padding: 1.25rem 1rem;

@@ -8,6 +8,7 @@ interface ChatMessage {
     text: string;
     timestamp: string;
     modelUsed?: string;
+    webSearchCount?: number;
 }
 
 interface WayAheadModalProps {
@@ -16,18 +17,18 @@ interface WayAheadModalProps {
 }
 
 const QUICK_PROMPTS = [
-    { label: '🚀 Way Ahead & Roadmap', prompt: 'What is the Way Ahead and multi-stage strategic roadmap for this story?' },
-    { label: '⚡ News Implications', prompt: 'What are the short-term and long-term implications of this news?' },
-    { label: '📜 Past News Context', prompt: 'Has this type of news occurred in the past? Summarize related historical context.' },
-    { label: '📊 Scenario Matrix', prompt: 'What are the baseline, upside, and risk scenarios for this development?' }
+    { label: '🚀 What is the way ahead?', prompt: 'What is the way ahead and expected strategic roadmap for this story?' },
+    { label: '⚡ Key implications & impact', prompt: 'What are the short-term and long-term implications of this news?' },
+    { label: '📜 Background & past context', prompt: 'Has this occurred in the past? Summarize related background and context.' },
+    { label: '📊 Scenarios & risk outlook', prompt: 'What are the baseline, upside, and risk scenarios for this development?' }
 ];
 
 export const WayAheadModal: React.FC<WayAheadModalProps> = ({ article, onClose }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputQuery, setInputQuery] = useState<string>('');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
+    const [activeModel, setActiveModel] = useState<string>('Meta Llama-3.3-70B');
     const [error, setError] = useState<string | null>(null);
-    const [activeModel, setActiveModel] = useState<string>('SATARK AI Engine');
 
     const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,13 +41,11 @@ export const WayAheadModal: React.FC<WayAheadModalProps> = ({ article, onClose }
         const welcomeMsg: ChatMessage = {
             id: 'welcome-1',
             sender: 'assistant',
-            text: `Hello! I am **SATARK AI**, your Strategic & Geopolitical Intelligence Chatbot.
+            text: `Hello! I'm your **Way Ahead** intelligence assistant. I analyze news stories using strategic step-by-step reasoning and live multi-wire search.
 
-I've cross-referenced **"${article.title}"** against our news feeds and historical archive.
-
-Click a quick prompt chip below or type your question:`,
+Ask me about what lies ahead, policy implications, background history, or upcoming milestones for this story.`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            modelUsed: 'SATARK AI Assistant'
+            modelUsed: 'Meta Llama-3.3-70B'
         };
         setMessages([welcomeMsg]);
     }, [article]);
@@ -95,25 +94,27 @@ Click a quick prompt chip below or type your question:`,
             });
 
             if (!response.ok) {
-                throw new Error('Failed to reach SATARK AI backend server.');
+                throw new Error('Failed to reach backend service.');
             }
 
             const data = await response.json();
             if (data.success && data.reply) {
+                const returnedModel = data.modelUsed || activeModel;
+                setActiveModel(returnedModel);
                 const assistantMsg: ChatMessage = {
                     id: `ai-${Date.now()}`,
                     sender: 'assistant',
                     text: data.reply,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    modelUsed: data.modelUsed
+                    modelUsed: returnedModel,
+                    webSearchCount: data.webSearchCount
                 };
-                if (data.modelUsed) setActiveModel(data.modelUsed);
                 setMessages(prev => [...prev, assistantMsg]);
             } else {
-                throw new Error('Invalid response received from SATARK AI Chatbot.');
+                throw new Error('Invalid response received from assistant.');
             }
         } catch (err: any) {
-            setError(err.message || 'An error occurred while generating AI response.');
+            setError(err.message || 'An error occurred while answering your question.');
         } finally {
             setIsGenerating(false);
         }
@@ -168,17 +169,26 @@ Click a quick prompt chip below or type your question:`,
 
     return (
         <div className="modal-backdrop" onClick={onClose}>
-            <div className="wayahead-modal-content chatbot-mode" onClick={(e) => e.stopPropagation()}>
+            <div className="wayahead-modal-content" onClick={(e) => e.stopPropagation()}>
 
                 {/* Modal Header */}
                 <div className="wayahead-modal-header">
                     <div className="header-left-group">
-                        <div className="glowing-wayahead-badge">
-                            <span className="badge-sparkle">🔮</span> SATARK AI CHAT
+                        <div className="header-icon-wrap">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                            </svg>
                         </div>
                         <div className="header-title-wrapper">
-                            <h2>Way Ahead &amp; Intelligence Assistant</h2>
-                            <span className="ai-model-pill">{activeModel}</span>
+                            <div className="header-main-title">
+                                <h2>Way Ahead</h2>
+                                <span className="header-model-chip" title="Active AI Inference Engine">
+                                    <span className="model-chip-pulse"></span>
+                                    {activeModel}
+                                </span>
+                            </div>
+                            <span className="header-badge">Reasoning &amp; Live Web Search</span>
                         </div>
                     </div>
                     <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
@@ -186,16 +196,11 @@ Click a quick prompt chip below or type your question:`,
                     </button>
                 </div>
 
-                {/* Article Context Header Strip */}
-                <div className="article-context-strip">
-                    <div className="context-meta">
-                        <span className="context-source">{article.source}</span>
-                        <span className="meta-sep">•</span>
-                        <span className="context-cat">{article.category}</span>
-                        <span className="meta-sep">•</span>
-                        <span className="context-date">{new Date(article.publishedAt).toLocaleDateString()}</span>
-                    </div>
-                    <h3 className="context-title">{article.title}</h3>
+                {/* Concise Article Context Strip */}
+                <div className="article-context-bar">
+                    <span className="context-tag">STORY</span>
+                    <span className="context-title" title={article.title}>{article.title}</span>
+                    <span className="context-source">{article.source}</span>
                 </div>
 
                 {/* Chat Scroll Container */}
@@ -203,34 +208,76 @@ Click a quick prompt chip below or type your question:`,
                     {messages.map((msg) => (
                         <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
                             <div className="chat-avatar">
-                                {msg.sender === 'assistant' ? '🤖' : '👤'}
+                                {msg.sender === 'assistant' ? (
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                        <circle cx="12" cy="5" r="2"></circle>
+                                        <path d="M12 7v4"></path>
+                                        <line x1="8" y1="16" x2="8" y2="16"></line>
+                                        <line x1="16" y1="16" x2="16" y2="16"></line>
+                                    </svg>
+                                ) : (
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                )}
                             </div>
                             <div className="chat-bubble">
                                 <div className="bubble-header">
-                                    <span className="sender-name">
-                                        {msg.sender === 'assistant' ? 'SATARK AI Intelligence' : 'You'}
-                                    </span>
+                                    <div className="bubble-header-left">
+                                        <span className="sender-name">
+                                            {msg.sender === 'assistant' ? 'Way Ahead AI' : 'You'}
+                                        </span>
+                                        {msg.sender === 'assistant' && msg.modelUsed && (
+                                            <span className="bubble-model-tag" title={`Inference Model: ${msg.modelUsed}`}>
+                                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                                </svg>
+                                                {msg.modelUsed}
+                                            </span>
+                                        )}
+                                        {msg.sender === 'assistant' && typeof msg.webSearchCount === 'number' && msg.webSearchCount > 0 && (
+                                            <span className="bubble-search-count" title={`${msg.webSearchCount} live web search results analyzed`}>
+                                                🔍 {msg.webSearchCount} web sources
+                                            </span>
+                                        )}
+                                    </div>
                                     <span className="bubble-time">{msg.timestamp}</span>
                                 </div>
                                 <div className="bubble-body">
                                     {renderMarkdown(msg.text)}
                                 </div>
-                                {msg.modelUsed && msg.sender === 'assistant' && (
-                                    <div className="bubble-footer">
-                                        <span className="model-tag">Model: {msg.modelUsed}</span>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     ))}
 
                     {isGenerating && (
                         <div className="chat-bubble-wrapper assistant generating">
-                            <div className="chat-avatar">🤖</div>
+                            <div className="chat-avatar">
+                                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                    <circle cx="12" cy="5" r="2"></circle>
+                                    <path d="M12 7v4"></path>
+                                </svg>
+                            </div>
                             <div className="chat-bubble">
+                                <div className="bubble-header">
+                                    <div className="bubble-header-left">
+                                        <span className="sender-name">Way Ahead AI</span>
+                                        <span className="generating-model-pill" title="Active model synthesizing output">
+                                            <span className="generating-spinner"></span>
+                                            Inference: {activeModel}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div className="bubble-body thinking-state">
-                                    <span className="pulse-loader-sm"></span>
-                                    <span>SATARK AI is analyzing feeds &amp; calculating intelligence response...</span>
+                                    <span className="typing-dots">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </span>
+                                    <span>Searching web &amp; generating trajectory with <strong>{activeModel}</strong>...</span>
                                 </div>
                             </div>
                         </div>
@@ -247,7 +294,7 @@ Click a quick prompt chip below or type your question:`,
 
                 {/* Quick Action Suggestion Chips */}
                 <div className="quick-prompts-bar">
-                    <span className="prompts-label">Suggested Questions:</span>
+                    <span className="prompts-label">Quick Prompts:</span>
                     <div className="chips-wrapper">
                         {QUICK_PROMPTS.map((qp, idx) => (
                             <button
@@ -267,7 +314,7 @@ Click a quick prompt chip below or type your question:`,
                     <form onSubmit={handleSubmit} className="chat-form">
                         <input
                             type="text"
-                            placeholder="Ask SATARK AI about implications, past events, or way ahead..."
+                            placeholder="Ask a question about this story, roadmap, or implications..."
                             value={inputQuery}
                             onChange={(e) => setInputQuery(e.target.value)}
                             className="chat-input"
@@ -277,8 +324,12 @@ Click a quick prompt chip below or type your question:`,
                             type="submit"
                             className="chat-send-btn"
                             disabled={isGenerating || !inputQuery.trim()}
+                            title="Send message"
                         >
-                            {isGenerating ? 'Analyzing...' : 'Send ➔'}
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
                         </button>
                     </form>
                 </div>
