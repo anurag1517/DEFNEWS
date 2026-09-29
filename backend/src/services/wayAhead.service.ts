@@ -183,6 +183,7 @@ export async function handleWayAheadChat(params: PredictiveChatParams) {
     }
 
     // 3. Fallback Reasoning Engine if LLM is temporarily unreachable
+    console.warn('[AUDIT] Hugging Face chat model was unavailable or failed. Activating deterministic fallback reasoning engine.');
     const lowerUserMsg = lastUserMsg.toLowerCase();
     let fallbackReply = '';
 

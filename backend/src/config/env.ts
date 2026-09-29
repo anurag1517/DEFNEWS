@@ -36,5 +36,7 @@ export const env = {
     googleTrendsFeedUrl: process.env.GOOGLE_TRENDS_FEED_URL!,
     frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:5173',
     hfToken: process.env.HF_TOKEN ?? process.env.HUGGINGFACE_API_KEY,
-    hfModel: process.env.HF_MODEL ?? 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
+    hfModel: process.env.HF_MODEL ?? 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+    geminiApiKey: process.env.GEMINI_API_KEY!,
+    geminiModel: process.env.GEMINI_MODEL ?? 'gemini-3.8-flash'
 } as const;

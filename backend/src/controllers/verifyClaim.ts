@@ -143,7 +143,14 @@ export async function verifyClaim(req: Request, res: Response, next: NextFunctio
             inputType: type,
             matchedArticles: matchedArticles.map(a => ({ title: a.title, source: a.source })),
             heuristicScore: score
-        }).catch(() => null);
+        }).catch((err) => {
+            console.error('[AUDIT] Hugging Face analyzeClaimWithAI rejected unexpectedly:', err?.message || err);
+            return null;
+        });
+
+        if (!aiAnalysis) {
+            console.warn(`[AUDIT] Hugging Face claim verification model was unavailable or failed. Using heuristic veracity scoring fallback (${score}/100).`);
+        }
 
         res.json({
             success: true,
