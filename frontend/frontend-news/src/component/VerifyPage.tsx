@@ -6,6 +6,7 @@ import './VerifyPage.css';
 type InputMode = 'link' | 'image';
 
 interface AIAnalysis {
+    description?: string;
     credibilityScore: number;
     verdict: string;
     reasoning: string;
@@ -373,8 +374,11 @@ export const VerifyPage: React.FC = () => {
 
             {/* ── Results ─────────────────────────────────────────── */}
             {result && (() => {
-                const verdict = getVerdictConfig(result.veracity.score);
+                const effectiveScore = result.aiAnalysis?.credibilityScore ?? result.veracity.score;
+                const verdict = getVerdictConfig(effectiveScore);
                 const hasReasoning = !!result.aiAnalysis?.reasoning;
+                const flags = result.aiAnalysis?.redFlags?.length ? result.aiAnalysis.redFlags : result.riskFlags;
+
                 return (
                     <div className="satark-response-block">
 
@@ -382,27 +386,125 @@ export const VerifyPage: React.FC = () => {
                         <div className="satark-response-header">
                             <div className="satark-avatar">🤖</div>
                             <div>
-                                <span className="satark-sender-name">SATARK AI</span>
+                                <span className="satark-sender-name">SATARK AI Verification Radar</span>
                                 <span className="satark-timestamp">{formatReadableDate(result.incidentOrigin.publishedDate)}</span>
                             </div>
                             <span className="satark-verdict-pill" style={{ background: verdict.bg, color: verdict.color, borderColor: verdict.border }}>
-                                {verdict.label}
+                                {effectiveScore}/100 · {result.aiAnalysis?.verdict || verdict.label}
                             </span>
                         </div>
 
-                        {/* Body: pure prose */}
+                        {/* Body */}
                         <div className="satark-response-body">
 
-                            {/* AI reasoning — main content */}
-                            {hasReasoning ? (
-                                <div className="satark-md-body">
-                                    {renderMarkdown(result.aiAnalysis!.reasoning)}
+                            {/* Headline statement */}
+                            {result.analyzedHeadline && (
+                                <div className="satark-headline-text">
+                                    "{result.analyzedHeadline}"
                                 </div>
-                            ) : (
-                                <p className="satark-prose">{result.verdictSummary}</p>
                             )}
 
-                            {/* Footer: source + date */}
+                            {/* Executive Overview */}
+                            {result.aiAnalysis?.description && (
+                                <div className="satark-section">
+                                    <span className="satark-section-title">📌 Claim Overview</span>
+                                    <p className="satark-prose" style={{ color: '#e2e8f0', fontSize: '0.92rem' }}>
+                                        {result.aiAnalysis.description}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Multi-Source Veracity Breakdown */}
+                            {result.veracity?.breakdown && (
+                                <div className="satark-section">
+                                    <span className="satark-section-title">📊 Multi-Source Metric Signals</span>
+                                    <div className="satark-score-prose">
+                                        <div className="satark-score-row">
+                                            <span className="satark-score-label">Source Authority</span>
+                                            <div className="satark-score-bar-wrap">
+                                                <div className="satark-score-bar" style={{ width: `${result.veracity.breakdown.sourceAuthority}%`, background: '#6366f1' }} />
+                                            </div>
+                                            <span className="satark-score-pct" style={{ color: '#818cf8' }}>{result.veracity.breakdown.sourceAuthority}%</span>
+                                        </div>
+                                        <div className="satark-score-row">
+                                            <span className="satark-score-label">Cross-Verification</span>
+                                            <div className="satark-score-bar-wrap">
+                                                <div className="satark-score-bar" style={{ width: `${result.veracity.breakdown.crossVerification}%`, background: '#06b6d4' }} />
+                                            </div>
+                                            <span className="satark-score-pct" style={{ color: '#22d3ee' }}>{result.veracity.breakdown.crossVerification}%</span>
+                                        </div>
+                                        <div className="satark-score-row">
+                                            <span className="satark-score-label">Content Analysis</span>
+                                            <div className="satark-score-bar-wrap">
+                                                <div className="satark-score-bar" style={{ width: `${result.veracity.breakdown.contentAnalysis}%`, background: '#10b981' }} />
+                                            </div>
+                                            <span className="satark-score-pct" style={{ color: '#34d399' }}>{result.veracity.breakdown.contentAnalysis}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* In-Depth AI reasoning */}
+                            <div className="satark-section">
+                                <span className="satark-section-title">🔍 Comprehensive Intelligence Breakdown</span>
+                                {hasReasoning ? (
+                                    <div className="satark-md-body">
+                                        {renderMarkdown(result.aiAnalysis!.reasoning)}
+                                    </div>
+                                ) : (
+                                    <div className="satark-md-body">
+                                        {renderMarkdown(result.veracity?.explanation || result.verdictSummary)}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Red Flags & Risk Indicators */}
+                            {flags && flags.length > 0 && (
+                                <div className="satark-section">
+                                    <span className="satark-section-title">🚩 Red Flags &amp; Risk Indicators</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                        {flags.map((flag, idx) => (
+                                            <div key={idx} className="satark-flag-line satark-flag-red">
+                                                ⚠️ {flag}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actionable Recommendation */}
+                            {result.aiAnalysis?.recommendation && (
+                                <div className="satark-section satark-recommendation">
+                                    <span className="satark-section-title" style={{ color: '#10b981' }}>💡 Reader Recommendation</span>
+                                    <div className="satark-md-body">
+                                        <p className="chat-paragraph">{result.aiAnalysis.recommendation}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Corroborating Feed Coverage */}
+                            {result.matchedArticles && result.matchedArticles.length > 0 && (
+                                <div className="satark-section">
+                                    <span className="satark-section-title">📰 Corroborating News Wire Coverage</span>
+                                    <div className="satark-article-links">
+                                        {result.matchedArticles.map((article) => (
+                                            <a
+                                                key={article.id}
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="satark-article-link"
+                                            >
+                                                <span className="satark-link-source">[{article.source}]</span>
+                                                <span className="satark-link-title">{article.title}</span>
+                                                <span className="satark-link-arrow">↗</span>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Footer: source + date + model */}
                             <div className="satark-meta-footer">
                                 <span className="satark-meta-source">
                                     📰 {result.analyzedSource}
@@ -411,12 +513,16 @@ export const VerifyPage: React.FC = () => {
                                 <span className="satark-meta-date">
                                     Published {formatReadableDate(result.incidentOrigin.publishedDate)}
                                 </span>
-                                {result.aiAnalysis?.modelUsed && (
+                                {result.incidentOrigin?.latencyDays > 0 && (
                                     <>
                                         <span className="satark-meta-sep">·</span>
-                                        <span className="satark-model-tag">{result.aiAnalysis.modelUsed}</span>
+                                        <span>Incident: ~{result.incidentOrigin.latencyDays}d ago</span>
                                     </>
                                 )}
+                                <span className="satark-meta-sep">·</span>
+                                <span className="satark-model-tag">
+                                    Engine: {result.aiAnalysis?.modelUsed || 'SATARK Heuristic Radar'}
+                                </span>
                             </div>
 
                         </div>
