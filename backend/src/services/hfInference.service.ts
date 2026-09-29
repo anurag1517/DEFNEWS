@@ -166,7 +166,7 @@ async function executeGeminiVerify(userMessage: string, modelName: string = env.
     if (!env.geminiApiKey) throw new Error("Missing Gemini API Key.");
 
     const genAI = new GoogleGenerativeAI(env.geminiApiKey);
-    const modelsToTry = Array.from(new Set([modelName, 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite']));
+    const modelsToTry = Array.from(new Set([modelName, 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite']));
     let lastError: any = null;
 
     for (const m of modelsToTry) {
